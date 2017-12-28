@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd"
+	version="2.0">
+
+	<named-query name="Product.findAllWithoutRelationship">
+		<query>
+ 			select 
+ 				p 
+ 			from 
+ 				Product p 
+ 		</query>
+	</named-query>
+
+	<named-query name="Product.findAllFetchProduct" >
+		<query>
+			select 
+				p
+			from
+				Product p 
+				left join fetch p.products
+			where  
+				p.parentProduct is not null 
+				or 
+				size(p.products) > 0 
+			order by 
+				p.id
+        </query>
+	</named-query>
+	
+	<named-query name="Product.findAllFetchImage" >
+		<query>
+			select 
+				distinct p
+			from
+				Product p 
+				join fetch p.images
+			order by 
+				p.id
+        </query>
+	</named-query>
+	
+	<named-query name="Product.getOneFetchImage" >
+		<query>
+			select 
+				distinct p
+			from
+				Product p 
+				join fetch p.images
+			where
+				p.id = :productId
+        </query>
+	</named-query>
+	
+	<named-query name="Product.geOnetWithoutRelationship">
+		<query>
+ 			select 
+ 				p 
+ 			from 
+ 				Product p 
+ 			where
+ 				p.id = :productId
+ 		</query>
+	</named-query>
+	
+	<named-native-query name="Product.getOneFetchProduct" result-class="br.com.avenuecode.evaluation.api.model.Product">
+		<query>
+ 			with prod(id, name, description, parent_product_id) as (
+			    select 
+					parent.id, parent.name, parent.description, parent.parent_product_id
+				from 
+					product parent
+			
+				where 
+					parent.parent_product_id is null and parent.id = :productId
+				and exists
+					(select 
+						p.parent_product_id, count(*) 
+					from 
+						product p
+					where
+						p.parent_product_id = parent.id
+					group by
+						p.parent_product_id) 
+			    union all     
+				select 
+					child.id, child.name, child.description, child.parent_product_id
+				from
+					prod
+				join product child on prod.id = child.parent_product_id
+			)
+			select id, name, description, parent_product_id from prod;
+			
+ 		</query>
+	</named-native-query>
+	
+	<named-native-query name="Product.getOneContainsProductAndOrImage" result-class="br.com.avenuecode.evaluation.api.model.Product">
+		<query>
+ 			with prod(id, name, description, parent_product_id, id_url) as (
+			    select 
+					parent.id, parent.name, parent.description, parent.parent_product_id, parent.id as id_url
+				from 
+					product parent
+					left join image img on img.product_id = parent.id
+				where 
+					parent.parent_product_id is null 
+				or exists
+					(select 
+						p.parent_product_id, count(*) 
+					from 
+						product p
+					where
+						p.parent_product_id = parent.id 
+					group by
+						p.parent_product_id
+                    or
+                    select i.product_id, count(*) from image i where i.product_id = parent.id
+                   ) 
+			    union all     
+				select 
+					child.id, child.name, child.description, child.parent_product_id, prod.id_url
+				from
+					prod
+				join product child on prod.id = child.parent_product_id
+                               
+			)
+			select 
+				p2.* 
+			from 
+				prod p
+                join product p2 on p2.id = p.id
+			where 
+				p.id_url = :productId			
+ 		</query>
+	</named-native-query>
+
+	<named-native-query name="Image.findImageByProductId" result-class="br.com.avenuecode.evaluation.api.model.Image">
+		<query>
+ 			with prod(parentId, parent_product_id, id, type, product_id) as (
+			    select 
+					parent.id as parentId, parent.parent_product_id, img.*
+				from 
+					product parent
+                     left join image img on img.product_id = parent.id
+				where 
+					parent.parent_product_id is null and parent.id = :productId
+				and exists
+					(select 
+						p.parent_product_id, count(*) 
+					from 
+						product p
+					where
+						p.parent_product_id = parent.id
+					group by
+						p.parent_product_id) 
+			    union all     
+				select 
+					child.id, child.parent_product_id, img.*
+				from
+					prod
+				join product child on prod.parentId = child.parent_product_id
+                                left join image img on img.product_id = child.id
+			)
+			select  
+				id, type, product_id
+             from 
+             	prod 
+             where id is not null;
+			
+ 		</query>
+	</named-native-query>
+	
+	
+	<named-native-query name="Product.findAllFetchProductAndOrImage" result-class="br.com.avenuecode.evaluation.api.model.Product">
+		<query>
+ 			with prod(id, name, description, parent_product_id, id_url) as (
+			    select 
+					parent.id, parent.name, parent.description, parent.parent_product_id, parent.id as id_url
+				from 
+					product parent
+					left join image img on img.product_id = parent.id
+				where 
+					parent.parent_product_id is null 
+				or exists
+					(select 
+						p.parent_product_id, count(*) 
+					from 
+						product p
+					where
+						p.parent_product_id = parent.id 
+					group by
+						p.parent_product_id
+                    or
+                    select i.product_id, count(*) from image i where i.product_id = parent.id
+                   ) 
+			    union all     
+				select 
+					child.id, child.name, child.description, child.parent_product_id, prod.id_url
+				from
+					prod
+				join product child on prod.id = child.parent_product_id
+                               
+			)
+			select 
+				distinct p2.* 
+			from 
+				prod p
+                join product p2 on p2.id = p.id
+             order by  id, parent_product_id
+ 		</query>
+	</named-native-query>
+		
+</entity-mappings>
