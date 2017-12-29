@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +18,10 @@ import br.com.avenuecode.evaluation.api.repository.ProductRepository;
 import br.com.avenuecode.evaluation.api.to.ProductTo;
 import br.com.avenuecode.evaluation.helper.ImageHelper;
 import br.com.avenuecode.evaluation.helper.ProductHelper;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class ProductService {
 
@@ -115,6 +121,7 @@ public class ProductService {
 
 	public void save(ProductTo productTo) {
 		Product product = ProductHelper.convertProductToWithImageToProduct(productTo);
+		
 		productRepository.save(product);
 	}
 

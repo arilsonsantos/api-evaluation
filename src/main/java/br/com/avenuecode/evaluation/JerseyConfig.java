@@ -15,6 +15,7 @@ public class JerseyConfig extends ResourceConfig {
 	@Autowired
 	public JerseyConfig(ObjectMapper objectMapper) {
 		packages("br.com.avenuecode.evaluation.api.resource");
+		property(org.glassfish.jersey.server.ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true);
 	}
 
 }

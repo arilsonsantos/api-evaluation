@@ -1,8 +1,16 @@
 package br.com.avenuecode.evaluation.api.resource;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -14,10 +22,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import br.com.avenuecode.evaluation.api.service.ProductService;
 import br.com.avenuecode.evaluation.api.to.ProductTo;
+import br.com.avenuecode.evaluation.message.ProductMessage;
 
 @Component
 @Produces(MediaType.APPLICATION_JSON)
@@ -27,6 +39,7 @@ public class ProductController {
 	
 	@Inject()
 	private ProductService productService;
+	
 
 	// Get all excluding relationships
 	@GET
@@ -93,9 +106,32 @@ public class ProductController {
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response save(ProductTo productTo) {
-		productService.save(productTo);
-		return response(productTo);
+	public Response save(ProductTo productTo)  {
+		
+		
+		
+		
+		
+		
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		Validator validator = factory.getValidator();
+
+		Set<ConstraintViolation<ProductTo>> constraintViolations = validator.validate(productTo);
+		
+		Set<ConstraintViolation<ProductTo>> constraintViolation = validator.validateProperty(productTo, "name");
+
+		List<String> errors = new ArrayList<>();
+		constraintViolations.stream().forEach(e -> errors.add(e.getMessage()));
+		
+		ProductMessage productMessage = new ProductMessage();
+		productMessage.setProductTo(productTo);
+		productMessage.setErrors(errors);
+		
+		if (productMessage.getErrors().isEmpty()) {
+			productService.save(productTo);
+		}
+		
+		return Response.ok().status(Status.NOT_ACCEPTABLE).entity(productMessage).build();
 	}
 	
 	@DELETE
@@ -123,5 +159,23 @@ public class ProductController {
 		}
 		return Response.ok(productsTo).build();
 	}
+	
+	private Response response(ProductMessage productMessage) {
+		return Response.ok().status(Status.CREATED).entity(productMessage).build();
+	}
+	
+	@ExceptionHandler(value = {ConstraintViolationException.class})
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+	public String handleValidationFailure(ConstraintViolationException ex) {
+
+	    StringBuilder messages = new StringBuilder();
+
+	    for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
+	        messages.append(violation.getMessage() + "\n");
+	    }
+
+	    return messages.toString();
+	}
+	
 
 }
