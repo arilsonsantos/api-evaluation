@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.validation.constraints.Size;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -16,7 +18,7 @@ import lombok.ToString;
 @Data
 @ToString(exclude= {"products", "images"})
 @EqualsAndHashCode(exclude= {"products", "images"})
-@JsonInclude(Include.NON_EMPTY)
+@JsonInclude(Include.NON_NULL)
 @NoArgsConstructor
 public class ProductTo implements Serializable {
 
@@ -24,8 +26,10 @@ public class ProductTo implements Serializable {
 	
 	private Long id;
 	
+	@Size(min=5, max=100, message="{product.name.size}")
 	private String name;
 	
+	@Size(min=5, max=200, message="{product.description.size}")
 	private String description;
 	
 	private Long parentProductId;
@@ -33,8 +37,10 @@ public class ProductTo implements Serializable {
 	@JsonIgnore
 	private ProductTo parentProduct;
 	
+	@JsonInclude(Include.NON_EMPTY)
 	private Set<ImageTo> images = new HashSet<>();
 	
+	@JsonInclude(Include.NON_EMPTY)
 	private Set<ProductTo> products = new HashSet<>();
 	
 	public ProductTo(Long id) {

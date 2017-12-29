@@ -113,9 +113,13 @@ public class ProductService {
 		return productsTo;
 	}
 
-	public void save(ProductTo productTo) {
+	
+	public Product save(ProductTo productTo) throws Exception {
 		Product product = ProductHelper.convertProductToWithImageToProduct(productTo);
+		
 		productRepository.save(product);
+		
+		return product;
 	}
 
 	public void delete(Long productId) {

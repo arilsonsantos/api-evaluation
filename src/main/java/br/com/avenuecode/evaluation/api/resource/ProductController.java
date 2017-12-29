@@ -3,6 +3,7 @@ package br.com.avenuecode.evaluation.api.resource;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -14,19 +15,20 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.springframework.stereotype.Component;
-
+import br.com.avenuecode.evaluation.api.model.Product;
 import br.com.avenuecode.evaluation.api.service.ProductService;
 import br.com.avenuecode.evaluation.api.to.ProductTo;
+import br.com.avenuecode.evaluation.message.ProductMessage;
 
-@Component
+//@Component
 @Produces(MediaType.APPLICATION_JSON)
 @Path(value = "/products")
 public class ProductController {
 
 	
-	@Inject()
+	@Inject
 	private ProductService productService;
+	
 
 	// Get all excluding relationships
 	@GET
@@ -91,11 +93,17 @@ public class ProductController {
 		return response(product);
 	}
 	
+	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response save(ProductTo productTo) {
-		productService.save(productTo);
-		return response(productTo);
+	public Response save(@Valid ProductTo productTo) throws Exception   {
+		
+		Product product = productService.save(productTo);
+		ProductMessage productMessage = new ProductMessage();
+		productTo.setId(product.getId());
+		productMessage.setProductTo(productTo);
+		
+		return response(productMessage);		
 	}
 	
 	@DELETE
@@ -107,8 +115,6 @@ public class ProductController {
 		productService.delete(productId);
 		return Response.status(Status.ACCEPTED).build();
 	}
-	
-	
 	
 	private Response response(ProductTo productTo) {
 		if (productTo == null) {
@@ -123,5 +129,12 @@ public class ProductController {
 		}
 		return Response.ok(productsTo).build();
 	}
+	
+	private Response response(ProductMessage productMessage) {
+		return Response.ok().status(Status.CREATED).entity(productMessage).build();
+	}
+	
+
+	
 
 }
