@@ -15,6 +15,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,8 +36,12 @@ public class Product  implements Serializable{
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	
+	@NotNull(message="{product.name.size}")
+	@Size(min=5, max=100, message="{product.name.size}")
 	private String name;
 	
+	@NotNull(message="{product.description.size}")
+	@Size(min=5, max=100, message="{product.description.size}")
 	private String description;
 	
 	@ManyToOne
