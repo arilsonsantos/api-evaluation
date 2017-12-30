@@ -9,8 +9,6 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import br.com.avenuecode.evaluation.api.to.ProductTo;
-
 @Provider
 public class GenericExceptionMapper implements ExceptionMapper<ConstraintViolationException> {
 
@@ -20,21 +18,11 @@ public class GenericExceptionMapper implements ExceptionMapper<ConstraintViolati
 		List<String> errors = new ArrayList<>();
 		violations.getConstraintViolations().stream().forEach(e -> errors.add(e.getMessage()));
 
-		Object object = violations.getConstraintViolations().iterator().next().getLeafBean();
+		ErrorMessage errorMessage = new ErrorMessage();
+		errorMessage.setErrors(errors);
 
-		if (!errors.isEmpty()) {
+		return Response.ok().status(Status.NOT_ACCEPTABLE).entity(errorMessage).build();
 
-			if (object instanceof ProductTo) {
-				ProductMessage productMessage = new ProductMessage();
-				productMessage.setProductTo((ProductTo) object);
-				productMessage.setErrors(errors);
-
-				return Response.ok().status(Status.NOT_ACCEPTABLE).entity(productMessage).build();
-			}
-
-		}
-
-		return Response.ok().status(Status.CREATED).build();
 	}
 
 }

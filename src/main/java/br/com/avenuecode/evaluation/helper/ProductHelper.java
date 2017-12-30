@@ -71,6 +71,9 @@ public class ProductHelper {
 		productTo.setId(product.getId());
 		productTo.setName(product.getName());
 		productTo.setDescription(product.getDescription());
+		if (product.getParentProduct() != null) {
+			productTo.setParentProductId(product.getParentProductId());
+		}
 	}
 	
 	public static void createStructure(List<ProductTo> produtosTo, Map<Long, ProductTo> mapChildParent, Product product,
@@ -79,13 +82,33 @@ public class ProductHelper {
 		if (product.getParentProduct() == null) {
 			produtosTo.add(productTo);
 		} else {
-			productTo.setParentProductId(product.getParentProductId());
-			if (product.getProducts() != null && !mapChildParent.containsKey(productTo.getId())) {
-				mapChildParent.get(product.getParentProductId()).add(productTo);
-			}
+			createStructureAddChild(mapChildParent, product, productTo);
 		}
 
 		mapChildParent.put(productTo.getId(), productTo);
 	}
 	
+	
+	public static void createStructure(List<ProductTo> produtosTo, Map<Long, ProductTo> mapChildParent, Product product,
+			ProductTo productTo, Map<String, ProductTo> mapParent) {
+		
+		if (mapParent.isEmpty()) {
+			if (product.getParentProduct() != null) {
+				productTo.setParentProductId(product.getParentProductId());
+			}
+			mapParent.put("parent", productTo);
+		} else {
+			createStructureAddChild(mapChildParent, product, productTo);
+		}
+
+		mapChildParent.put(productTo.getId(), productTo);
+	}
+
+	private static void createStructureAddChild(Map<Long, ProductTo> mapChildParent, Product product,
+			ProductTo productTo) {
+		productTo.setParentProductId(product.getParentProductId());
+		if (product.getProducts() != null) {
+			mapChildParent.get(product.getParentProductId()).add(productTo);
+		}
+	}
 }

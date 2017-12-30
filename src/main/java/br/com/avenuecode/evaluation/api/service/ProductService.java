@@ -89,21 +89,22 @@ public class ProductService {
 	public ProductTo getOneFetchProduct(Long productId) {
 		List<Product> products = productRepository.getOneFetchProduct(productId);
 		List<ProductTo> productsTo = new ArrayList<>();
+		Map<String, ProductTo> mapParent = new HashMap<>();
 		Map<Long, ProductTo> mapChildParent = new HashMap<>();
 		
 		products.forEach(product -> {
 			ProductTo productTo = ProductHelper.convertProductWithoutRelationshipToProductTo(product);
-			ProductHelper.createStructure(productsTo, mapChildParent, product, productTo);
+			ProductHelper.createStructure(productsTo, mapChildParent, product, productTo, mapParent);
 		});
 
-		return !productsTo.isEmpty() ? productsTo.get(0) : null;
+		return mapParent.get("parent");
 	}
 
 	public ProductTo getOneContainsProductAndOrImage(Long productId) {
 		List<Product> products = productRepository.getOneContainsProductAndOrImage(productId);
-		List<ProductTo> productsTo = containsProductAndOrImage(products);
+		ProductTo productTo = oneContainsProductAndOrImage(products);
 
-		return !productsTo.isEmpty() ? productsTo.get(0) : null;
+		return productTo;
 	}
 
 	public List<ProductTo> findAllFetchProductAndOrImage() {
@@ -146,6 +147,21 @@ public class ProductService {
 		});
 		return productsTo;
 	}
+	
+	private ProductTo oneContainsProductAndOrImage(List<Product> products) {
+		List<ProductTo> productsTo = new ArrayList<>();
+		Map<String, ProductTo> mapParent = new HashMap<>();
+		Map<Long, ProductTo> mapChildParent = new HashMap<>();
+
+		products.forEach(product -> {
+			ProductTo productTo = ProductHelper.convertProductWithoutRelationshipToProductTo(product);
+			fillImageTo(productTo);
+			ProductHelper.createStructure(productsTo, mapChildParent, product, productTo, mapParent);
+		});
+		
+		return mapParent.isEmpty() ? null : mapParent.get("parent");
+	}
+
 
 	private void fillImageTo(ProductTo productTo) {
 		List<Image> images = imageRepository.findByProductId(productTo.getId());
