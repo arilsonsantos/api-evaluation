@@ -73,7 +73,7 @@
 					product parent
 			
 				where 
-					parent.parent_product_id is null and parent.id = :productId
+					parent.id = :productId
 				and exists
 					(select 
 						p.parent_product_id, count(*) 

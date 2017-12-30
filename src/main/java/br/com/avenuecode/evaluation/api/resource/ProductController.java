@@ -29,7 +29,6 @@ public class ProductController {
 	@Inject
 	private ProductService productService;
 	
-
 	// Get all excluding relationships
 	@GET
 	public Response getProducts() {
@@ -93,17 +92,13 @@ public class ProductController {
 		return response(product);
 	}
 	
-	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response save(@Valid ProductTo productTo) throws Exception   {
-		
 		Product product = productService.save(productTo);
-		ProductMessage productMessage = new ProductMessage();
-		productTo.setId(product.getId());
-		productMessage.setProductTo(productTo);
+		ProductMessage productMessage = new ProductMessage(product.getId());
 		
-		return response(productMessage);		
+		return Response.ok().status(Status.CREATED).entity(productMessage).build();
 	}
 	
 	@DELETE
@@ -130,11 +125,6 @@ public class ProductController {
 		return Response.ok(productsTo).build();
 	}
 	
-	private Response response(ProductMessage productMessage) {
-		return Response.ok().status(Status.CREATED).entity(productMessage).build();
-	}
-	
 
-	
 
 }
