@@ -115,7 +115,7 @@ public class ProductService {
 	}
 
 	
-	public Product save(ProductTo productTo) throws Exception {
+	public Product save(ProductTo productTo)  {
 		Product product = ProductHelper.convertProductToWithImageToProduct(productTo);
 		
 		productRepository.save(product);

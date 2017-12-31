@@ -94,7 +94,7 @@ public class ProductController {
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response save(@Valid ProductTo productTo) throws Exception   {
+	public Response save(@Valid ProductTo productTo)   {
 		Product product = productService.save(productTo);
 		ProductMessage productMessage = new ProductMessage(product.getId());
 		
