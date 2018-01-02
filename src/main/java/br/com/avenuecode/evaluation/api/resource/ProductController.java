@@ -20,7 +20,7 @@ import br.com.avenuecode.evaluation.api.service.ImageService;
 import br.com.avenuecode.evaluation.api.service.ProductService;
 import br.com.avenuecode.evaluation.api.to.ImageTo;
 import br.com.avenuecode.evaluation.api.to.ProductTo;
-import br.com.avenuecode.evaluation.message.ProductMessage;
+import br.com.avenuecode.evaluation.message.MessageResponse;
 
 //@Component
 @Produces(MediaType.APPLICATION_JSON)
@@ -101,7 +101,7 @@ public class ProductController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response save(@Valid ProductTo productTo)   {
 		Product product = productService.save(productTo);
-		ProductMessage productMessage = new ProductMessage(product.getId());
+		MessageResponse productMessage = new MessageResponse(product.getId());
 		
 		return Response.ok().status(Status.CREATED).entity(productMessage).build();
 	}
@@ -132,8 +132,13 @@ public class ProductController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/{productId}/images")
 	public Response updateImage(@PathParam("productId") Long productId, List<ImageTo> imagesTo){
-		imageService.save(productId, imagesTo);
-		return null;
+		MessageResponse productMessage = imageService.save(productId, imagesTo);
+		
+		if (productMessage.getImagesTo() == null) {
+			return Response.ok().status(Status.NOT_FOUND).entity(productMessage).build();
+		}
+		
+		return Response.ok().status(Status.CREATED).entity(productMessage).build();
 	}
 	
 	
