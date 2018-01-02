@@ -27,7 +27,6 @@ public class ImageHelper {
 	}
 	
 	public static Image convertImageToImage(ImageTo imageTo) {
-
 		Image image = new Image();
 		image.setId(imageTo.getId());
 		image.setType(imageTo.getType());
@@ -35,6 +34,26 @@ public class ImageHelper {
 
 		return image;
 	}
+	
+	public static ImageTo convertImageToImageToWithoutReletionship(Image image) {
+		ImageTo imageTo = new ImageTo();
+		imageTo.setId(image.getId());
+		imageTo.setType(image.getType());
+		
+		return imageTo;
+	}
+	
+	public static ImageTo convertImageToImageToWithProduct(Image image) {
+		ImageTo imageTo = new ImageTo();
+		imageTo.setId(image.getId());
+		imageTo.setType(image.getType());
+		
+		ProductTo productTo = ProductHelper.convertProductWithImageToProductTo(image.getProduct());
+		imageTo.setProductTo(productTo);
+
+		return imageTo;
+	}
+	
 	
 	
 }

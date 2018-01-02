@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -26,9 +27,11 @@ public class ProductTo implements Serializable {
 	
 	private Long id;
 	
+	@NotNull(message="{product.name.null}")
 	@Size(min=5, max=100, message="{product.name.size}")
 	private String name;
 	
+	@NotNull(message="{product.description.null}")
 	@Size(min=5, max=200, message="{product.description.size}")
 	private String description;
 	

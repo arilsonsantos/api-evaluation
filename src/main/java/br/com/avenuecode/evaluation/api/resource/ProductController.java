@@ -16,7 +16,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import br.com.avenuecode.evaluation.api.model.Product;
+import br.com.avenuecode.evaluation.api.service.ImageService;
 import br.com.avenuecode.evaluation.api.service.ProductService;
+import br.com.avenuecode.evaluation.api.to.ImageTo;
 import br.com.avenuecode.evaluation.api.to.ProductTo;
 import br.com.avenuecode.evaluation.message.ProductMessage;
 
@@ -28,6 +30,9 @@ public class ProductController {
 	
 	@Inject
 	private ProductService productService;
+	
+	@Inject
+	private ImageService imageService;
 	
 	// Get all excluding relationships
 	@GET
@@ -46,7 +51,7 @@ public class ProductController {
 	
 	// Get all including specified relationships (images)
 	@GET
-	@Path("/image")
+	@Path("/images")
 	public Response findAllFetchImage() {
 		List<ProductTo> products = productService.findAllFetchImage();
 		return response(products);
@@ -78,7 +83,7 @@ public class ProductController {
 	
 	// Get one including relationships (images)
 	@GET
-	@Path("/{productId}/image")
+	@Path("/{productId}/images")
 	public Response getOneFetchImage(@PathParam("productId") Long productId) {
 		ProductTo productTo = productService.getOneFetchImage(productId);
 		return response(productTo);
@@ -94,7 +99,7 @@ public class ProductController {
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response save(@Valid ProductTo productTo) throws Exception   {
+	public Response save(@Valid ProductTo productTo)   {
 		Product product = productService.save(productTo);
 		ProductMessage productMessage = new ProductMessage(product.getId());
 		
@@ -110,6 +115,28 @@ public class ProductController {
 		productService.delete(productId);
 		return Response.status(Status.ACCEPTED).build();
 	}
+	
+	
+	//IMAGES
+	@DELETE
+	@Path("/{productId}/images/{imageId}")
+	public Response deleteImage(@PathParam("imageId") Long imageId){
+		if (imageService.getOne(imageId) == null) {
+			return Response.status(Status.NO_CONTENT).build();
+		}
+		imageService.delete(imageId);
+		return Response.status(Status.ACCEPTED).build();
+	}
+	
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/{productId}/images")
+	public Response updateImage(@PathParam("productId") Long productId, List<ImageTo> imagesTo){
+		imageService.save(productId, imagesTo);
+		return null;
+	}
+	
+	
 	
 	private Response response(ProductTo productTo) {
 		if (productTo == null) {
