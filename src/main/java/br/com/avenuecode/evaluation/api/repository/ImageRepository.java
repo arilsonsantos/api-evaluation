@@ -19,8 +19,7 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
 	// Get set of child products for specific product
 	@Query(value = "select img from Image img where img.product.id = :productId")
 	List<Image> findByProductId(@Param("productId") Long productId);
-
-
+	
 	@Modifying
 	@Query(value = "INSERT INTO image (type, product_id) VALUES (:type,:product_id)", nativeQuery = true)
 	@Transactional

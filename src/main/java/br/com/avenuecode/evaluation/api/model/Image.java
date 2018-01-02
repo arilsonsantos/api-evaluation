@@ -3,6 +3,7 @@ package br.com.avenuecode.evaluation.api.model;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -28,7 +29,11 @@ public class Image implements Serializable {
 
 	private String type;
 
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.LAZY)
 	private Product product;
+	
+	public Image (String type) {
+		this.type = type;
+	}
 
 }

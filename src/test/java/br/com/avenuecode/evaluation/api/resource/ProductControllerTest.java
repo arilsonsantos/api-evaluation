@@ -27,7 +27,7 @@ public class ProductControllerTest {
     TestRestTemplate testRestTemplate;
 	
 	@Test	
-    public void testGetAllProduct() {
+    public void testFindAllProduct() {
         ResponseEntity<String> result = testRestTemplate.getForEntity("/api/evaluation/products", String.class);
         
         String expected = "["
@@ -57,11 +57,11 @@ public class ProductControllerTest {
         assertEquals(result.getBody(), expected);
         assertEquals(result.getStatusCode(), HttpStatus.OK);
         
-        log.info("*** Resource:  /api/evaluation/products - Status: " +  result.getStatusCode());
+        log.info("*** (GET) Resource:  /api/evaluation/products - Status: " +  result.getStatusCode());
     }
 	
 	@Test	
-    public void testGetAllProductWithProduct() {
+    public void testFindAllProductWithProduct() {
         ResponseEntity<String> result = testRestTemplate.getForEntity("/api/evaluation/products/product", String.class);
         
         String expected = "["
@@ -92,7 +92,7 @@ public class ProductControllerTest {
         assertEquals(result.getBody(), expected);
         assertEquals(result.getStatusCode(), HttpStatus.OK);
         
-        log.info("*** Resource:  /api/evaluation/products/product - Status: " +  result.getStatusCode());
+        log.info("*** (GET) Resource:  /api/evaluation/products/product - Status: " +  result.getStatusCode());
     }
 	
 	@Test	
@@ -129,7 +129,7 @@ public class ProductControllerTest {
         assertEquals(result.getBody(), expected);
         assertEquals(result.getStatusCode(), HttpStatus.OK);
         
-        log.info("*** Resource:  /api/evaluation/products/image - Status: " +  result.getStatusCode());
+        log.info("*** (GET) Resource:  /api/evaluation/products/image - Status: " +  result.getStatusCode());
     }
 	
 	
@@ -186,11 +186,11 @@ public class ProductControllerTest {
         assertEquals(result.getBody(), expected);
         assertEquals(result.getStatusCode(), HttpStatus.OK);
         
-        log.info("*** Resource:  /api/evaluation/products/product-and-or-image - Status: " +  result.getStatusCode());
+        log.info("*** (GET) Resource:  /api/evaluation/products/product-and-or-image - Status: " +  result.getStatusCode());
     }
 	
 	@Test	
-    public void testOneProductt() {
+    public void testGetOneProduct() {
         ResponseEntity<String> result = testRestTemplate.getForEntity("/api/evaluation/products/1", String.class);
         
         String expected = "{\"id\":1,\"name\":\"PRODUCT 01\",\"description\":\"DESCRIPTION OF PRODUCT 01\"}";
@@ -198,11 +198,11 @@ public class ProductControllerTest {
         assertEquals(result.getBody(), expected);
         assertEquals(result.getStatusCode(), HttpStatus.OK);
         
-        log.info("*** Resource:  /api/evaluation/products/1 - Status: " +  result.getStatusCode());
+        log.info("*** (GET) Resource:  /api/evaluation/products/1 - Status: " +  result.getStatusCode());
 	}
 	
 	@Test	
-    public void testOneProductWithProduct() {
+    public void testGetOneProductWithProduct() {
         ResponseEntity<String> result = testRestTemplate.getForEntity("/api/evaluation/products/1/product", String.class);
         
         String expected = "{\"id\":1,"
@@ -217,11 +217,11 @@ public class ProductControllerTest {
         assertEquals(result.getBody(), expected);
         assertEquals(result.getStatusCode(), HttpStatus.OK);
         
-        log.info("*** Resource:  /api/evaluation/products/1/product - Status: " +  result.getStatusCode());
+        log.info("*** (GET) Resource:  /api/evaluation/products/1/product - Status: " +  result.getStatusCode());
 	}
 	
 	@Test	
-    public void testOneProductWithImage() {
+    public void testGetOneProductWithImage() {
         ResponseEntity<String> result = testRestTemplate.getForEntity("/api/evaluation/products/1/image", String.class);
         
         String expected = "{\"id\":1,\"name\":\"PRODUCT 01\",\"description\":\"DESCRIPTION OF PRODUCT 01\",\"images\":[{\"id\":1,\"type\":\"JPG\"}]}";
@@ -229,11 +229,11 @@ public class ProductControllerTest {
         assertEquals(result.getBody(), expected);
         assertEquals(result.getStatusCode(), HttpStatus.OK);
         
-        log.info("*** Resource:  /api/evaluation/products/1/image - Status: " +  result.getStatusCode());
+        log.info("*** (GET) Resource:  /api/evaluation/products/1/image - Status: " +  result.getStatusCode());
 	}
 	
 	@Test	
-    public void testOneProductWithProductAndOrImage() {
+    public void testGetOneProductWithProductAndOrImage() {
         ResponseEntity<String> result = testRestTemplate.getForEntity("/api/evaluation/products/1/product-and-or-image", String.class);
         
         String expected = "{\"id\":1,"
@@ -260,13 +260,13 @@ public class ProductControllerTest {
         assertEquals(result.getBody(), expected);
         assertEquals(result.getStatusCode(), HttpStatus.OK);
         
-        log.info("*** Resource:  /api/evaluation/products/1/product-and-or-image - Status: " +  result.getStatusCode());
+        log.info("*** (GET) Resource:  /api/evaluation/products/1/product-and-or-image - Status: " +  result.getStatusCode());
 	}
 	
 	@Test	
-    public void testPostOneProduct() {
+    public void testPostOneProductInvalidName() {
 		
-		String request = "{\"name\":\"NEW PROD\",\"description\":\"NEW PROD\",\"parentProductId\":\"6\",\"images\":[{\"type\":\"PNG\"},{\"type\":\"JPG\"}]}";
+		String request = "{\"name\":\"NEW\",\"description\":\"NEW PRODUCUT OF 6\",\"parentProductId\":\"6\",\"images\":[{\"type\":\"PNG\"},{\"type\":\"JPG\"}]}";
 		
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -274,11 +274,56 @@ public class ProductControllerTest {
 		HttpEntity<String> entity = new HttpEntity<String>(request, httpHeaders);
 		
         ResponseEntity<String> result = testRestTemplate.postForEntity("/api/evaluation/products",entity,  String.class );
-        String idCreated = "{\"id\":7}";
+        String expected = "{\"Errors\":[\"The name must have between 5 and 100 characters.\"]}";
         
-        assertEquals(result.getBody(), idCreated);
+        assertEquals(result.getBody(), expected);
+        assertEquals(result.getStatusCode(), HttpStatus.NOT_ACCEPTABLE);
+        
+        log.info("*** (POST) Resource:  /api/evaluation/products - Status: " +  result.getStatusCode());
+        log.info(request);
+        log.error("Return: " + expected);
+	}
+	
+	@Test	
+    public void testPostOneProductNullName() {
+		
+		String request = "{\"description\":\"NEW PRODDUCT OF 6\",\"parentProductId\":\"6\",\"images\":[{\"type\":\"PNG\"},{\"type\":\"JPG\"}]}";
+		
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+		
+		HttpEntity<String> entity = new HttpEntity<String>(request, httpHeaders);
+		
+        ResponseEntity<String> result = testRestTemplate.postForEntity("/api/evaluation/products",entity,  String.class );
+        String expected = "{\"Errors\":[\"The name can't be null.\"]}";
+        
+        assertEquals(result.getBody(), expected);
+        assertEquals(result.getStatusCode(), HttpStatus.NOT_ACCEPTABLE);
+        
+        log.info("*** (POST) Resource:  /api/evaluation/products - Status: " +  result.getStatusCode());
+        log.info(request);
+        log.error("Return: " + expected);
+	}
+	
+	@Test	
+    public void testPostProduct() {
+		
+		String request = "{\"name\":\"NEW PRDUCT\",\"description\":\"NEW PRODUCUT OF 6\",\"parentProductId\":\"6\","
+				+ "\"images\":[{\"type\":\"PNGJ\"},{\"type\":\"JPG\"}]}";
+		
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+		
+		HttpEntity<String> entity = new HttpEntity<String>(request, httpHeaders);
+		
+        ResponseEntity<String> result = testRestTemplate.postForEntity("/api/evaluation/products",entity,  String.class );
+        String expected = "{\"id\":7}";
+        
+        assertEquals(result.getBody(), expected);
         assertEquals(result.getStatusCode(), HttpStatus.CREATED);
         
-        log.info("*** Resource:  /api/evaluation/products - Status: " +  result.getStatusCode());
+        log.info("*** (POST) Resource:  /api/evaluation/products - Status: " +  result.getStatusCode());
+        log.info(request);
+        log.info("Return: " + expected);
 	}
 }
