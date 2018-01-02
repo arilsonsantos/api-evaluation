@@ -66,4 +66,8 @@ public class ImageService {
 	public void delete(Long imageId) {
 		imageRepository.delete(imageId);
 	}
+	
+	public void delete(Product product) {
+		imageRepository.delete(product);
+	}
 }

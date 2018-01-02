@@ -1,29 +1,49 @@
-# README #
+# API Evaluation #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+## What is this repository for? ##
 
-### What is this repository for? ###
+* The API Evaluation provides resources to add and get products through across rest services using Json content-type.
+* Version 1.0.0
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+#### Available resources 
 
-### How do I get set up? ###
+###### GET 
+* /api/evaluation/products
+* /api/evaluation/products/product
+* /api/evaluation/products/images
+* /api/evaluation/products/product-and-or-image
+* /api/evaluation/products/{productId}
+* /api/evaluation/products/{productId}/product
+* /api/evaluation/products/{productId}/images
+* /api/evaluation/products/{productId}/product-and-or-image
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+###### POST 
+* /api/evaluation/products
+* /api/evaluation/products/{productId}/images
 
-### Contribution guidelines ###
+###### DELETE 
+* /api/evaluation/products/{productId}
+* /api/evaluation/products/{productId}/images
+* /api/evaluation/products/{productId}/images/{imagemId}  
 
-* Writing tests
-* Code review
-* Other guidelines
 
-### Who do I talk to? ###
+#### Setup 
 
-* Repo owner or admin
-* Other community or team contact
+1. Make a clone of the repository 
+2. git clone https://arilsonsantos@bitbucket.org/arilsonsantos/evaluation.git 
+
+
+#### Run tests 
+
+* mvn test
+
+#### Run the application
+
+* mvn spring-boot:run
+
+
+#### Examples
+
+* ##### GET
+
+* curl -X GET http://localhost:8080/api/evaluation/products

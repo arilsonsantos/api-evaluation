@@ -10,13 +10,14 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.avenuecode.evaluation.api.model.Image;
+import br.com.avenuecode.evaluation.api.model.Product;
 
 @Repository
 public interface ImageRepository extends JpaRepository<Image, Long> {
 
-	// List<Image> findImagesByProducts(@Param("productId") Long productId);
-
-	// Get set of child products for specific product
+	@Query(value="select img from Image img where img.id = :id")
+	Image getOne(@Param("id") Long imageId);
+	
 	@Query(value = "select img from Image img where img.product.id = :productId")
 	List<Image> findByProductId(@Param("productId") Long productId);
 	
@@ -28,4 +29,9 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
 	@Modifying
 	@Transactional
 	void delete(Long id);
+	
+	@Modifying
+	@Transactional
+	@Query(value="delete from Image img where img.product = :product")
+	void delete(@Param("product") Product product);
 }

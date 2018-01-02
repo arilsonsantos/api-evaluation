@@ -22,7 +22,6 @@ import br.com.avenuecode.evaluation.api.to.ImageTo;
 import br.com.avenuecode.evaluation.api.to.ProductTo;
 import br.com.avenuecode.evaluation.message.MessageResponse;
 
-//@Component
 @Produces(MediaType.APPLICATION_JSON)
 @Path(value = "/products")
 public class ProductController {
@@ -125,6 +124,19 @@ public class ProductController {
 			return Response.status(Status.NO_CONTENT).build();
 		}
 		imageService.delete(imageId);
+		return Response.status(Status.ACCEPTED).build();
+	}
+	
+	@DELETE
+	@Path("/{productId}/images")
+	public Response deleteImageByProduct(@PathParam("productId") Long productId){
+		Product product = productService.getOne(productId);
+		if (product == null) {
+			return Response.status(Status.NO_CONTENT).build();
+		}
+		
+		imageService.delete(product);
+		
 		return Response.status(Status.ACCEPTED).build();
 	}
 	
