@@ -30,7 +30,7 @@
 #### Setup 
 
 1. Make a clone of the repository 
-2. git clone https://arilsonsantos@bitbucket.org/arilsonsantos/evaluation.git 
+2. git clone https://github.com/arilsonsantos/api-evaluation.git
 
 
 #### Run tests 
