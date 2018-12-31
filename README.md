@@ -1,7 +1,7 @@
 # API Evaluation #
 
 
-* The API Evaluation provides resources to add and get products through across rest services using Json content-type.
+* The API Evaluation provides resources to add and get products through across rest services using Json content-type (JAX-RS Implementation).
 * Version 1.0.0
 
 #### Available resources 
